@@ -101,3 +101,30 @@ Aapke paas ek `Dockerfile` hai jo web application ko define karta hai, aur aap c
 - `docker build` -> Docker image build kar raha hai
 - `-t mywebapp:01` -> Image ko naam "mywebapp" aur version/tag "01" de raha hai
 - `.` -> Dockerfile current directory mein hai, aur isi se build hoga.
+
+------------------
+````
+docker rmi my_test_image:02
+````
+
+The command `docker rmi my_test_image:02` ka use ek **Docker image** ko remove (delete) karne ke liye hota hai. Is command mein hum ek specific image ka naam aur uska tag de rahe hain, taaki Docker us image ko remove kar sake.
+
+### Breakdown in Hinglish:
+
+1. **`docker rmi`**:
+   - **`rmi`** ka matlab hai **"remove image"**. Yeh command Docker images ko delete karne ke liye use hoti hai.
+   - Is command se Docker image aapke local machine se remove ho jaati hai.
+
+2. **`my_test_image:02`**:
+   - **`my_test_image`**: Yeh image ka naam hai jo aap delete karna chahte ho.
+   - **`:02`**: Yeh image ka **tag** hai. Aapne specific version ya tag `02` mention kiya hai. Agar image ke paas multiple tags hain, toh aap us tag ka naam specify karte ho jo delete karna hai.
+   
+   - Example: Agar `my_test_image` ke paas multiple versions hain, jaise `my_test_image:01`, `my_test_image:02`, etc., toh sirf `:02` tag wala image delete hoga.
+
+### Overall Command Meaning:
+
+Yeh command Docker ko bol raha hai ki **`my_test_image` ka version/tag `02`** ko aapke local system se delete kare. Agar image currently kisi running container mein use nahi ho raha, toh woh safely remove ho jayega. Agar image kisi container ke saath associated hai ya container us image par dependent hai, toh Docker error throw karega ya force remove ke liye `-f` flag add karna padega.
+
+### Note:
+- Agar aapko **sabhi tags** ke saath image delete karna hai, toh aap sirf `my_test_image` likh sakte hain.
+- Example: `docker rmi my_test_image`
