@@ -25,7 +25,7 @@ docker run --rm -d --name "my_container" -p 3003:3000 e9f98515e2be
 
 To overall, yeh command ek container ko background mein run karegi, uska naam `my_container` hoga, aur local machine ka port `3003` container ke `3000` port se connected hoga. Aur jab container ka kaam khatam ho jayega, toh woh automatic delete ho jayega.
 
-
+-------------------
 
 ````
 docker ps -a
@@ -65,7 +65,7 @@ abcd12345efg   ubuntu       "/bin/bash"              3 days ago      Up 2 hours 
 Isse aapko pura history mil jata hai jo aapke system pe chale hue ya stopped containers ke baare mein hota hai.
 
 
-
+-------------------
 
 ````
 docker build -t mywebapp:01 .
