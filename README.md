@@ -128,3 +128,98 @@ Yeh command Docker ko bol raha hai ki **`my_test_image` ka version/tag `02`** ko
 ### Note:
 - Agar aapko **sabhi tags** ke saath image delete karna hai, toh aap sirf `my_test_image` likh sakte hain.
 - Example: `docker rmi my_test_image`
+
+----------------------
+
+````
+docker image ls
+````
+
+The command `docker image ls` ka use system par available **Docker images** ko list karne ke liye hota hai. Is command ke zariye aapko aapke system par stored sabhi Docker images ke baare mein information milti hai.
+
+### Breakdown in Hinglish:
+
+1. **`docker image ls`**:
+   - Yeh command sabhi Docker images ko list karta hai jo aapne pull, build, ya create kiye hain.
+   - `ls` ka matlab hota hai "list".
+
+### Example Output:
+```bash
+REPOSITORY          TAG           IMAGE ID       CREATED         SIZE
+mywebapp            latest        a3d5c73a2f6b   2 days ago      132MB
+ubuntu              20.04         3b418d7b4669   5 days ago      72.9MB
+nginx               stable        b233aaa2ef38   1 week ago      23.1MB
+```
+
+### Columns Explanation:
+1. **REPOSITORY**: 
+   - Yeh column image ke naam ko dikhata hai (jaise `mywebapp`, `ubuntu`, `nginx`). Yeh naam ya toh aap khud assign karte ho jab image build hoti hai, ya default naam hota hai jab aap Docker Hub ya kisi aur registry se image pull karte hain.
+
+2. **TAG**: 
+   - Isme image ka specific version ya tag hota hai. Jaise `latest`, `20.04`, `stable`, etc. Yeh versioning ke liye use hota hai.
+
+3. **IMAGE ID**: 
+   - Har image ka ek unique ID hota hai jo Docker internally use karta hai. Agar aapko specific image ke saath koi action perform karna ho, toh aap is ID ko refer kar sakte hain.
+
+4. **CREATED**: 
+   - Yeh column batata hai ki image kab create ya pull kiya gaya tha.
+
+5. **SIZE**: 
+   - Isme image ka size dikhai deta hai. Matlab kitna space yeh image aapke local system par le raha hai.
+
+### Use Cases:
+- Aapko agar dekhna hai ki kaun kaun se Docker images aapke system mein stored hain.
+- Agar aapko unnecessary images delete karni hain space save karne ke liye.
+- Aapko kisi specific image ko update ya use karna hai, toh aap uski **image ID** ya **tag** dekh sakte hain.
+
+### Additional Options:
+- **`docker image ls -a`**: Yeh command **sabhi images** ko dikhata hai, including intermediate (dangling) images jo puri tarah se remove nahi hue hote.
+- **`docker image ls --filter dangling=true`**: Sirf un images ko list karta hai jo Docker ke intermediate build steps se bachi hoti hain, jo ab use nahi ho rahi.
+
+-----------------------------------
+
+````
+docker tag my_test_image:01 therishabh19/webapp-demo:02
+````
+
+
+The command `docker tag my_test_image:01 therishabh19/webapp-demo:02` ka use ek **existing Docker image** ko **naya naam** aur **naya tag** dene ke liye hota hai. Effectively, aap apne image ko ek new repository ya registry mein upload karne ke liye ready kar rahe hote ho.
+
+1. **`docker tag`**:
+   - **Tag** command ka use ek existing image ko naya naam ya tag dene ke liye hota hai, without actually copying the image. Aap sirf reference create karte ho.
+
+2. **`my_test_image:01`**:
+   - Yeh existing image ka naam aur tag hai. Is example mein, aap `my_test_image` ka **`01` version** (tag) ko naya tag dena chahte hain.
+
+3. **`therishabh19/webapp-demo:02`**:
+   - **`therishabh19`**: Yeh Docker Hub ya kisi bhi registry ka username hai. Agar aap Docker Hub pe image push karne wale hain, toh username ka hona zaroori hai.
+   - **`webapp-demo`**: Yeh naya repository name hai jisme aap image ko upload karenge.
+   - **`:02`**: Yeh naya tag (version) hai. Is command mein aap image ka version `02` define kar rahe hain.
+
+### Command Ka Kya Matlab Hai?
+
+Is command ka matlab hai ki aap **existing image** `my_test_image:01` ko **naya naam aur version** de rahe hain, jisme:
+- Image ka **naya repository name** hoga: `therishabh19/webapp-demo`
+- Aur **naya tag/version** hoga: `02`
+
+### Example Scenario:
+
+1. Aapke paas local machine pe ek image hai `my_test_image:01`, aur ab aap chahte hain ki ise **Docker Hub** pe push karen taaki doosre log bhi ise access kar sakein.
+2. To push karne se pehle, aapko image ka naam aur tag ko Docker Hub ke compatible format mein change karna padta hai, jisme username/repository aur tag specified ho.
+   
+### Steps After Tagging:
+1. **Image ko push karna**: 
+   - Ab aap is tagged image ko Docker Hub ya kisi aur registry pe push kar sakte ho by using:
+     ```bash
+     docker push therishabh19/webapp-demo:02
+     ```
+
+2. **Docker Hub par upload ke baad**:
+   - Aap aur doosre log ise pull kar sakte hain by running:
+     ```bash
+     docker pull therishabh19/webapp-demo:02
+     ```
+
+### In Short:
+- **`docker tag`** command ka use ek image ko naya naam aur tag dene ke liye hota hai.
+- Aap apni local image `my_test_image:01` ko `therishabh19/webapp-demo:02` naam aur tag ke saath mark kar rahe ho, jisse aap ise Docker Hub ya kisi aur registry pe upload kar sako.
