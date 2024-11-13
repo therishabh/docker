@@ -57,8 +57,9 @@ This Dockerfile creates a containerized environment to run a Node.js application
 Together, these commands set up and run a Node.js app inside a container by copying files, installing dependencies, and then executing the start script.
 
 ----------------------
+----------------------
 
-### Show Docker Images
+## Show Docker Images
 
 ````
 docker image ls
