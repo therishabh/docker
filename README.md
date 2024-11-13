@@ -56,7 +56,7 @@ Together, these commands set up and run a Node.js app inside a container by copy
 ----------------------
 ----------------------
 
-## Show Docker Images
+## Show list of docker images
 
 ````
 docker image ls
