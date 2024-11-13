@@ -3,12 +3,6 @@
 | S.No. | Section |
 |---------|-------------|
 | 1.  | [Explanation of basic Dockerfile](#explanation-of-basic-dockerfile) |
-| [Explain Command: `docker run --rm -d --name "my_container" -p 3003:3000 e9f98515e2be`](#explain-command-docker-run---rm--d--name-my_container--p-30033000-e9f98515e2be) | Breakdown of the `docker run` command |
-| [Explain Command: `docker ps -a`](#explain-command-docker-ps--a) | Usage and examples of `docker ps -a` command |
-| [Explain Command: `docker build -t mywebapp:01 .`](#explain-command-docker-build--t-mywebapp01-) | Explanation of the `docker build` command |
-| [Explain Command: `docker rmi my_test_image:02`](#explain-command-docker-rmi-my_test_image02) | Description of `docker rmi` command |
-| [Explain Command: `docker image ls`](#explain-command-docker-image-ls) | Details on the `docker image ls` command |
-| [Explain Command: `docker tag my_test_image:01 therishabh19/webapp-demo:02`](#explain-command-docker-tag-my_test_image01-therishabh19webapp-demo02) | Explanation of `docker tag` for renaming images | 
 
 
 ## Explanation of basic Dockerfile
