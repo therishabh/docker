@@ -56,6 +56,35 @@ This Dockerfile creates a containerized environment to run a Node.js application
 
 Together, these commands set up and run a Node.js app inside a container by copying files, installing dependencies, and then executing the start script.
 
+----------------------
+
+### Show Docker Images
+
+````
+docker image ls
+````
+
+Is command `docker image ls` ka use system par available **Docker images** ko list karne ke liye hota hai. Is command ke zariye aapko aapke system par stored sabhi Docker images ke baare mein information milti hai.
+
+**`docker image ls`**:
+   - Yeh command sabhi Docker images ko list karta hai jo aapne pull, build, ya create kiye hain.
+   - `ls` ka matlab hota hai "list".
+
+##### Example Output:
+```bash
+REPOSITORY          TAG           IMAGE ID       CREATED         SIZE
+mywebapp            latest        a3d5c73a2f6b   2 days ago      132MB
+ubuntu              20.04         3b418d7b4669   5 days ago      72.9MB
+nginx               stable        b233aaa2ef38   1 week ago      23.1MB
+```
+
+##### Additional Options:
+- **`docker image ls -a`**: Yeh command **sabhi images** ko dikhata hai, including intermediate (dangling) images jo puri tarah se remove nahi hue hote.
+- **`docker image ls --filter dangling=true`**: Sirf un images ko list karta hai jo Docker ke intermediate build steps se bachi hoti hain, jo ab use nahi ho rahi.
+
+-----------------------------------
+
+
 
 ## Explain command
 ````
@@ -123,6 +152,7 @@ Isse aapko pura history mil jata hai jo aapke system pe chale hue ya stopped con
 
 
 -------------------
+### Build a Docker image
 
 ````
 docker build -t mywebapp:01 .
@@ -146,10 +176,6 @@ This command is used to **build a Docker image** from a **Dockerfile** present i
 4. **`.` (dot)**:
    - Yeh **current directory** ko refer karta hai. Iska matlab hai ki Docker current directory se `Dockerfile` search karega aur uske base pe image banayega.
    - Dot ka use location specify karne ke liye hota hai jahan Dockerfile aur baaki build context present hote hain.
-
-### Overall Command Meaning:
-
-Yeh command current directory (`.`) mein present **Dockerfile** ka use karke ek Docker image banayega, aur us image ko `mywebapp` naam aur `01` version assign karega.
 
 ### Example Scenario:
 Aapke paas ek `Dockerfile` hai jo web application ko define karta hai, aur aap chahte ho ki usse ek image banayein jisse baad mein containers run kiye ja sakein. Yeh command aapko image ka naam aur version define karne ka option deta hai, jo future mein aapko alag-alag versions ke liye helpful hoga.
@@ -186,54 +212,7 @@ Yeh command Docker ko bol raha hai ki **`my_test_image` ka version/tag `02`** ko
 - Agar aapko **sabhi tags** ke saath image delete karna hai, toh aap sirf `my_test_image` likh sakte hain.
 - Example: `docker rmi my_test_image`
 
-----------------------
 
-````
-docker image ls
-````
-
-The command `docker image ls` ka use system par available **Docker images** ko list karne ke liye hota hai. Is command ke zariye aapko aapke system par stored sabhi Docker images ke baare mein information milti hai.
-
-### Breakdown in Hinglish:
-
-1. **`docker image ls`**:
-   - Yeh command sabhi Docker images ko list karta hai jo aapne pull, build, ya create kiye hain.
-   - `ls` ka matlab hota hai "list".
-
-### Example Output:
-```bash
-REPOSITORY          TAG           IMAGE ID       CREATED         SIZE
-mywebapp            latest        a3d5c73a2f6b   2 days ago      132MB
-ubuntu              20.04         3b418d7b4669   5 days ago      72.9MB
-nginx               stable        b233aaa2ef38   1 week ago      23.1MB
-```
-
-### Columns Explanation:
-1. **REPOSITORY**: 
-   - Yeh column image ke naam ko dikhata hai (jaise `mywebapp`, `ubuntu`, `nginx`). Yeh naam ya toh aap khud assign karte ho jab image build hoti hai, ya default naam hota hai jab aap Docker Hub ya kisi aur registry se image pull karte hain.
-
-2. **TAG**: 
-   - Isme image ka specific version ya tag hota hai. Jaise `latest`, `20.04`, `stable`, etc. Yeh versioning ke liye use hota hai.
-
-3. **IMAGE ID**: 
-   - Har image ka ek unique ID hota hai jo Docker internally use karta hai. Agar aapko specific image ke saath koi action perform karna ho, toh aap is ID ko refer kar sakte hain.
-
-4. **CREATED**: 
-   - Yeh column batata hai ki image kab create ya pull kiya gaya tha.
-
-5. **SIZE**: 
-   - Isme image ka size dikhai deta hai. Matlab kitna space yeh image aapke local system par le raha hai.
-
-### Use Cases:
-- Aapko agar dekhna hai ki kaun kaun se Docker images aapke system mein stored hain.
-- Agar aapko unnecessary images delete karni hain space save karne ke liye.
-- Aapko kisi specific image ko update ya use karna hai, toh aap uski **image ID** ya **tag** dekh sakte hain.
-
-### Additional Options:
-- **`docker image ls -a`**: Yeh command **sabhi images** ko dikhata hai, including intermediate (dangling) images jo puri tarah se remove nahi hue hote.
-- **`docker image ls --filter dangling=true`**: Sirf un images ko list karta hai jo Docker ke intermediate build steps se bachi hoti hain, jo ab use nahi ho rahi.
-
------------------------------------
 
 ````
 docker tag my_test_image:01 therishabh19/webapp-demo:02
