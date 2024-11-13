@@ -1,4 +1,51 @@
-# docker
+# Docker
+
+
+## Explanation of basic Dockerfile
+````
+FROM node:20
+
+# Set the working directory inside the container
+WORKDIR /myapp
+
+# Copy package.json and package-lock.json to the working directory
+COPY package*.json .
+
+# Install the dependencies
+RUN npm install
+
+# Copy the rest of the application’s code
+COPY . .
+
+CMD ["npm", "start"]
+````
+
+This Dockerfile creates a containerized environment to run a Node.js application. Here’s a breakdown of each command:
+
+1. **`FROM node:20`**
+   - This line specifies the base image for the container. In this case, it’s the `node:20` image, which includes Node.js version 20. This image provides a compatible Node.js environment with all necessary binaries and dependencies, so you don’t have to install Node.js manually.
+
+2. **`WORKDIR /myapp`**
+   - This sets the working directory inside the container to `/myapp`. All subsequent commands in the Dockerfile are executed relative to this directory.
+   - If the directory doesn’t exist, Docker will create it. Setting a working directory also keeps the container’s file structure organized.
+
+3. **`COPY package*.json .`**
+   - This command copies the `package.json` and `package-lock.json` files from your project directory (on your host machine) to the `/myapp` directory inside the container.
+   - The `package*.json` pattern matches both `package.json` and `package-lock.json`, which define your app's dependencies and lockfile for reproducible installs.
+
+4. **`RUN npm install`**
+   - This installs the dependencies listed in `package.json`. The command runs `npm install` inside the `/myapp` directory of the container.
+   - By copying `package.json` and `package-lock.json` first, Docker can cache the dependencies layer. If no changes are detected in `package.json`, Docker skips this step in future builds, making them faster.
+
+5. **`COPY . .`**
+   - This copies the remaining application files (all other files in the current directory) from the host machine to the container’s `/myapp` directory. With this step, the entire application codebase is available inside the container.
+
+6. **`CMD ["npm", "start"]`**
+   - This specifies the default command to run when the container starts. `CMD` executes `npm start`, which is defined in `package.json` (often as a script that runs the app, like `node server.js`).
+   - This command ensures the application starts automatically when the container is launched.
+
+Together, these commands set up and run a Node.js app inside a container by copying files, installing dependencies, and then executing the start script.
+
 
 ## Explain command
 ````
