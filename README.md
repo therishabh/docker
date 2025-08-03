@@ -460,3 +460,177 @@ Ye command Mongo Express ko run karta hai – ek lightweight web-based UI jisse 
 
 
 ---
+---
+---
+
+# 🧩 **Docker Compose kya hai?**
+
+`Docker Compose` ek tool hai jo aapko multiple containers ko **ek saath define aur run** karne deta hai ek single YAML file ke through.
+
+🧠 **Real-life Analogy:**
+Socho har container ek actor hai, aur Docker Compose ek **script** hai jisme likha hota hai ki kaun kab aayega, kya karega, kis se baat karega.
+
+---
+
+## 🛠️ `docker-compose.yml` Ka Structure
+
+Ek basic `docker-compose.yml` file kuch is tarah dikhti hai:
+
+```yaml
+version: '3.8'
+
+services:
+  service1:
+    image: image-name
+    ports:
+      - "hostPort:containerPort"
+    environment:
+      VAR_NAME: value
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
+```
+
+---
+
+## 🧪 Example: MongoDB + Mongo Express
+
+Yeh wahi example hai jo humne pehle diya tha — MongoDB aur Mongo Express ko ek hi custom network me chalana.
+
+```yaml
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: qwerty
+    networks:
+      - mongo-network
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: qwerty
+      ME_CONFIG_MONGODB_URL: mongodb://admin:qwerty@mongodb:27017/
+    depends_on:
+      - mongodb
+    networks:
+      - mongo-network
+
+networks:
+  mongo-network:
+    driver: bridge
+```
+
+---
+
+## 🔍 **Line-by-line Explanation in Hinglish**
+
+| Section          | Meaning                                                                   |
+| ---------------- | ------------------------------------------------------------------------- |
+| `version: '3.8'` | Docker Compose ka version (3.8 is stable and widely supported).           |
+| `services:`      | Isme aap define karte ho **containers** (services = multiple containers). |
+
+### 🔹 mongodb service:
+
+| Key                       | Meaning                                                                                                    |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `image: mongo`            | MongoDB ka official Docker image use ho raha hai.                                                          |
+| `container_name: mongodb` | Container ka naam set kar diya hai `mongodb` (for reference).                                              |
+| `ports:`                  | Host\:Container port mapping.<br>Yahan host ke 27018 port ko container ke 27017 port se map kiya gaya hai. |
+| `environment:`            | Environment variables (like username/password).                                                            |
+| `networks:`               | Ye service custom `mongo-network` me connect hogi.                                                         |
+
+### 🔹 mongo-express service:
+
+| Key                             | Meaning                                                                                    |
+| ------------------------------- | ------------------------------------------------------------------------------------------ |
+| `image: mongo-express`          | Mongo Express ka image use kiya gaya hai.                                                  |
+| `container_name: mongo-express` | Container ka naam diya gaya hai.                                                           |
+| `ports:`                        | Host ke 8081 port se access hoga Mongo Express ka web UI.                                  |
+| `environment:`                  | MongoDB se connect hone ke liye admin username, password aur connection URL diya gaya hai. |
+| `depends_on:`                   | Ye ensure karta hai ki `mongodb` container pehle start ho, tab `mongo-express`.            |
+| `networks:`                     | Same network (`mongo-network`) me add kiya gaya hai.                                       |
+
+### 🔹 networks:
+
+```yaml
+networks:
+  mongo-network:
+    driver: bridge
+```
+
+* Custom bridge network banayi gayi hai.
+* Ye sab containers ko ek secure aur isolated environment provide karta hai.
+
+---
+
+## 🔧 **Compose Commands**
+
+### ✅ 1. Start all containers:
+
+```bash
+docker-compose up -d
+```
+
+➡️ Sab services background me run ho jaati hain.
+
+---
+
+### ✅ 2. Stop all containers:
+
+```bash
+docker-compose down
+```
+
+➡️ Sab containers, networks, etc. ko stop & delete kar deta hai (except volumes).
+
+---
+
+### ✅ 3. Rebuild containers (after image/env change):
+
+```bash
+docker-compose up --build -d
+```
+
+---
+
+### ✅ 4. Check running containers:
+
+```bash
+docker-compose ps
+```
+
+---
+
+### ✅ 5. Logs of all services:
+
+```bash
+docker-compose logs
+```
+
+---
+
+## 📘 Summary (Hinglish):
+
+* `docker-compose.yml` ek tarika hai ek se zyada containers ko ek saath manage karne ka.
+* YAML file me aap define karte ho services, unka image, ports, environment vars, and network.
+* Ek hi command (`docker-compose up`) se sab kuch chalu ho jata hai.
+* Ye repeatable, version-controlled aur scalable hota hai — real-world projects me bahut useful.
+
+---
+
+Agar chaho to main `env` file version bhi samjha sakta hoon jisme aap password, username file ke through rakh sakte ho for better security and reusability. Batana bas ✅
+
