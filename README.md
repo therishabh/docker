@@ -456,4 +456,7 @@ Ye command Mongo Express ko run karta hai – ek lightweight web-based UI jisse 
 * **Command 2** se hum Mongo Express run karte hain jo MongoDB ko GUI ke through manage karne deta hai.
 * Dono containers same Docker network (`mongo-network`) pe hain taaki ye easily ek doosre se communicate kar saken.
 
+<img width="1024" height="1024" alt="mongo-network" src="https://github.com/user-attachments/assets/0cb96311-5928-4705-a40d-5574aa131bcc" />
+
+
 ---
