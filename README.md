@@ -631,6 +631,100 @@ docker-compose logs
 * Ye repeatable, version-controlled aur scalable hota hai — real-world projects me bahut useful.
 
 ---
+---
+---
+---
 
-Agar chaho to main `env` file version bhi samjha sakta hoon jisme aap password, username file ke through rakh sakte ho for better security and reusability. Batana bas ✅
+# 🔐 `.env` File in Docker Compose
 
+`.env` file ek **key-value pair** file hoti hai jisme aap sensitive ya frequently changing values (like username, password, ports) ko store kar sakte ho.
+
+🧠 **Real-life analogy:**
+Socho `docker-compose.yml` ek recipe hai. `.env` file us recipe ke ingredients ke quantity ka table hai — alag file me likha hua.
+
+---
+
+## 🧾 Step-by-Step Setup
+
+### 📁 1. **Create `.env` file**
+
+`.env` file project root me banate hain:
+
+```env
+# .env
+MONGO_INITDB_ROOT_USERNAME=admin
+MONGO_INITDB_ROOT_PASSWORD=qwerty
+MONGO_EXPRESS_PORT=8081
+MONGODB_PORT=27018
+```
+
+---
+
+### 📄 2. **Update `docker-compose.yml` to use variables**
+
+```yaml
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "${MONGODB_PORT}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    networks:
+      - mongo-network
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    ports:
+      - "${MONGO_EXPRESS_PORT}:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/
+    depends_on:
+      - mongodb
+    networks:
+      - mongo-network
+
+networks:
+  mongo-network:
+    driver: bridge
+```
+
+---
+
+## ✅ Benefits of Using `.env` File
+
+| 🔐 Benefit          | 📄 Explanation                                                                                |
+| ------------------- | --------------------------------------------------------------------------------------------- |
+| **Security**        | Password, username hardcoded nahi karte — safe aur hidden rakh sakte ho.                      |
+| **Maintainability** | Agar port ya user change karna hai to sirf `.env` file edit karo, YAML file untouched rahegi. |
+| **Reusability**     | Same compose file different envs (dev, staging, prod) me use ho sakti hai.                    |
+| **Cleaner YAML**    | Compose file zyada readable aur short hoti hai.                                               |
+
+---
+
+## 🧪 Run the Compose Project
+
+No change in command! Docker Compose automatically `.env` file ko read karega:
+
+```bash
+docker-compose up -d
+```
+
+> Bas ensure karo ki `.env` file aur `docker-compose.yml` same directory me ho.
+
+---
+
+## 📘 Summary (Hinglish):
+
+* `.env` file me aap environment variables define karte ho.
+* Compose file me `${VAR_NAME}` syntax se inhe use karte ho.
+* Isse aapka setup zyada secure, clean aur maintainable hota hai.
+
+---
