@@ -257,3 +257,203 @@ Is command ka matlab hai ki aap **existing image** `my_test_image:01` ko **naya 
 ### In Short:
 - **`docker tag`** command ka use ek image ko naya naam aur tag dene ke liye hota hai.
 - Aap apni local image `my_test_image:01` ko `therishabh19/webapp-demo:02` naam aur tag ke saath mark kar rahe ho, jisse aap ise Docker Hub ya kisi aur registry pe upload kar sako.
+
+
+---
+# Docker Network
+
+Bilkul Rishabh! Chalo Docker network ko **beginner-friendly Hinglish** mein detail mein samajhte hain — real-life analogy ke saath, types ke saath, aur saare common commands ke saath.
+
+---
+
+## 🚧 **Docker Network kya hota hai?**
+
+Jab aap multiple Docker containers chalate ho, unhe **ek dusre se communicate** karna padta hai — jaise ki MongoDB aur Mongo Express ke beech. Ye communication possible hota hai via **Docker networks**.
+
+🧠 **Real-life analogy:**
+Socho har container ek chhota computer hai, aur Docker network ek Wi-Fi router hai. Jab tak wo sab ek hi Wi-Fi (network) par nahi hote, wo ek dusre se baat nahi kar sakte.
+
+---
+
+## 🔧 Docker Network ke **Types**
+
+Docker me mainly 3 built-in network types hote hain:
+
+| Type                                                         | Description                                                                                                      |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `bridge`                                                     | Default network jab aap standalone container chalate ho. Private internal network banata hai.                    |
+| `host`                                                       | Container directly host machine ka network use karta hai. Port mapping ki zarurat nahi padti.                    |
+| `none`                                                       | Container ko koi network access nahi diya jaata. Isolated hota hai.                                              |
+| 🧑‍🔧 **Custom bridge network** (most used in real projects) | Aap apna khud ka bridge network bana sakte ho. Containers isme easily ek dusre ko naam se access kar sakte hain. |
+
+---
+
+## 🔗 **Custom Network Kyu Use Karte Hain?**
+
+* Containers ko **by name access** kar sakte ho (e.g., `mongodb`).
+* Secure and isolated environment banta hai.
+* Useful in multi-container apps (e.g., backend + db + redis).
+
+---
+
+## 🛠️ **Common Docker Network Commands**
+
+### ✅ **1. Create a network**
+
+```bash
+docker network create my-custom-network
+```
+
+* Ye ek **bridge** type network banata hai by default.
+* Ab is network me containers add kar sakte ho using `--network=my-custom-network`.
+
+---
+
+### ✅ **2. List all networks**
+
+```bash
+docker network ls
+```
+
+🧾 Output me aapko network ka naam, ID, type, etc. dikhega.
+
+---
+
+### ✅ **3. Inspect a network**
+
+```bash
+docker network inspect my-custom-network
+```
+
+* Ye command network ke andar ka configuration dikhata hai:
+
+  * Konsa container is network me connected hai
+  * IP addresses kya hain
+  * Driver type kya hai (bridge, host, etc.)
+
+---
+
+### ✅ **4. Connect a running container to a network**
+
+```bash
+docker network connect my-custom-network my-container
+```
+
+* `my-container` ab `my-custom-network` ke andar aa jayega.
+
+---
+
+### ✅ **5. Disconnect a container from a network**
+
+```bash
+docker network disconnect my-custom-network my-container
+```
+
+---
+
+### ✅ **6. Remove/Delete a network**
+
+```bash
+docker network rm my-custom-network
+```
+
+🔴 Note: Network me koi container **attached nahi hona chahiye** tabhi aap delete kar sakte ho.
+
+---
+
+## 📦 Example Flow:
+
+```bash
+# Step 1: Create network
+docker network create mongo-network
+
+# Step 2: Run MongoDB in this network
+docker run -d --name=mongodb --network=mongo-network mongo
+
+# Step 3: Run Mongo Express in same network
+docker run -d --name=mongo-express --network=mongo-network -p 8081:8081 mongo-express
+
+# Step 4: Inspect network
+docker network inspect mongo-network
+```
+
+---
+
+## 📘 Summary (Hinglish):
+
+* Docker network containers ke beech communication ke liye highway jaisa hota hai.
+* Custom network ka use karne se containers ek dusre ko **naam se** access kar pate hain — IP ya port ki zarurat nahi padti.
+* Best practice: production ya dev environment me **custom bridge network** use karo.
+
+---
+
+
+## 🐳 **Command 1** – MongoDB Container Run
+
+```bash
+docker run -d --name=mongodb \
+-p 27018:27017 \
+--network=mongo-network \
+-e MONGO_INITDB_ROOT_USERNAME=admin \
+-e MONGO_INITDB_ROOT_PASSWORD=qwerty \
+mongo
+```
+
+### 🔍 Explanation:
+
+| Part                                   | Description                                                                                                                                                                      |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docker run`                           | Docker ko ek new container run karne ke liye command.                                                                                                                            |
+| `-d`                                   | Detached mode: Container background me run karega.                                                                                                                               |
+| `--name=mongodb`                       | Container ka naam `mongodb` rakha gaya hai (easy to reference).                                                                                                                  |
+| `-p 27018:27017`                       | Host ke port **27018** ko container ke **27017** port se map kiya gaya hai.<br>📝 27017 is MongoDB ka default port, lekin host pe hum 27018 use kar rahe hain to avoid conflict. |
+| `--network=mongo-network`              | Ye container `mongo-network` naam ke Docker network pe run karega, jisse ye kisi aur container (jaise mongo-express) se communicate kar sake.                                    |
+| `-e MONGO_INITDB_ROOT_USERNAME=admin`  | MongoDB ke root user ka username `admin` set kiya gaya hai (environment variable ke through).                                                                                    |
+| `-e MONGO_INITDB_ROOT_PASSWORD=qwerty` | Root user ka password `qwerty` set kiya gaya hai.                                                                                                                                |
+| `mongo`                                | Ye image ka naam hai (official MongoDB image from Docker Hub).                                                                                                                   |
+
+### 💡 Iska matlab:
+
+Hum ek MongoDB container run kar rahe hain jo custom port (27018) par accessible hai, aur jisme ek secured root user setup hai. Ye container ek custom Docker network par run ho raha hai taaki doosre services (jaise mongo-express) se easily connect ho sake.
+
+---
+
+## 🌐 **Command 2** – Mongo Express Container Run
+
+```bash
+docker run -d --name=mongo-express \
+--network=mongo-network \
+-p 8081:8081 \
+-e ME_CONFIG_MONGODB_ADMINUSERNAME=admin \
+-e ME_CONFIG_MONGODB_ADMINPASSWORD=qwerty \
+-e ME_CONFIG_MONGODB_URL=mongodb://admin:qwerty@mongodb:27017/ \
+mongo-express
+```
+
+### 🔍 Explanation:
+
+| Part                                                             | Description                                                                                                                                      |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `docker run`                                                     | Docker ko ek new container run karne ke liye command.                                                                                            |
+| `-d`                                                             | Detached mode (background me chalega).                                                                                                           |
+| `--name=mongo-express`                                           | Container ka naam `mongo-express` rakha gaya hai.                                                                                                |
+| `--network=mongo-network`                                        | Isko bhi same Docker network me daala gaya hai (jisme MongoDB hai).                                                                              |
+| `-p 8081:8081`                                                   | Host ke port **8081** ko container ke port **8081** se map kiya gaya hai.<br>📝 Is port par Mongo Express web UI chalega.                        |
+| `-e ME_CONFIG_MONGODB_ADMINUSERNAME=admin`                       | MongoDB ka admin username bataya gaya hai (jo command 1 me diya tha).                                                                            |
+| `-e ME_CONFIG_MONGODB_ADMINPASSWORD=qwerty`                      | MongoDB ka admin password.                                                                                                                       |
+| `-e ME_CONFIG_MONGODB_URL=mongodb://admin:qwerty@mongodb:27017/` | Is URL ke through Mongo Express ko MongoDB se connect karwaya gaya hai.<br>📝 `mongodb` yahan container name hai jise Docker DNS resolve karega. |
+| `mongo-express`                                                  | Ye image ka naam hai (official Mongo Express image from Docker Hub).                                                                             |
+
+### 💡 Iska matlab:
+
+Ye command Mongo Express ko run karta hai – ek lightweight web-based UI jisse aap MongoDB ke data ko GUI ke through dekh sakte hain. Ye web UI aapko `localhost:8081` pe dikhai dega, aur ye internally MongoDB container se connect karega.
+
+---
+
+## ✅ Summary (Hinglish)
+
+* **Command 1** se hum MongoDB container run karte hain with a secure admin user.
+* **Command 2** se hum Mongo Express run karte hain jo MongoDB ko GUI ke through manage karne deta hai.
+* Dono containers same Docker network (`mongo-network`) pe hain taaki ye easily ek doosre se communicate kar saken.
+
+---
