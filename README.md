@@ -1547,3 +1547,618 @@ docker-compose up -d
 * Isse aapka setup zyada secure, clean aur maintainable hota hai.
 
 ---
+
+## 💾 What is Docker Volume?
+
+**Docker Volume** ek mechanism hai **data ko container ke bahar** store karne ka — taaki wo **container delete hone ke baad bhi persist** rahe.
+
+🧠 **Real-life Analogy:**
+Socho container ek laptop hai, aur volume ek **external hard drive** jisme aapka data save hota hai. Agar laptop (container) crash ho bhi jaaye, aapka data to external drive (volume) me safe hai!
+
+---
+
+## 🔍 Why Use Volumes?
+
+| 📌 Use Case                   | ✅ Benefit                                              |
+| ----------------------------- | ------------------------------------------------------ |
+| Persistent data               | Container delete hone ke baad bhi data rahe            |
+| Share data between containers | Ek hi volume ko multiple containers use kar sakte hain |
+| Backup and restore            | Volume ka snapshot le sakte ho                         |
+| Performance                   | Volumes zyada optimized hote hain `bind mounts` se     |
+
+---
+
+## 🧰 Types of Docker Storage
+
+| Type             | Description                                                                                 |
+| ---------------- | ------------------------------------------------------------------------------------------- |
+| **Volumes**      | Docker manage karta hai, safest & recommended                                               |
+| **Bind mounts**  | Host system ke kisi path ko directly container me mount karna                               |
+| **tmpfs mounts** | Temporary in-memory mount (RAM me store hota hai) — container restart pe delete ho jata hai |
+
+---
+
+## 🏗️ Volume Creation Example
+
+### 🔹 1. Create a Volume
+
+```bash
+docker volume create mydata
+```
+
+### 🔹 2. Use Volume in a Container
+
+```bash
+docker run -d \
+  --name my-container \
+  -v mydata:/app/data \
+  busybox sleep 3600
+```
+
+* `-v mydata:/app/data`: host ka `mydata` volume container ke `/app/data` folder me mount hoga.
+
+---
+
+## 📁 Real Example: Use with MongoDB
+
+```bash
+docker run -d \
+  --name mongodb \
+  -p 27017:27017 \
+  -v mongo-volume:/data/db \
+  mongo
+```
+
+* MongoDB ka data `/data/db` me store hota hai
+* Humne us path pe ek named volume `mongo-volume` mount kar diya
+* Ab MongoDB ka data container ke bahar persist rahega
+
+---
+
+## 🔧 Volume Commands (Cheat Sheet)
+
+| Command                        | Use                                                         |
+| ------------------------------ | ----------------------------------------------------------- |
+| `docker volume create [name]`  | Naya volume create kare                                     |
+| `docker volume ls`             | Sab volumes list kare                                       |
+| `docker volume inspect [name]` | Volume ke details dekhne ke liye                            |
+| `docker volume rm [name]`      | Volume delete karne ke liye                                 |
+| `docker volume prune`          | Sab unused volumes delete kar dega (⚠️ confirmation aayega) |
+
+---
+
+## 🧪 Volume with Docker Compose
+
+**`docker-compose.yml` Example:**
+
+```yaml
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
+```
+
+🟢 Isme hum `mongo-data` naam ka volume define kar rahe hain jo MongoDB ke internal path `/data/db` se connect hoga.
+
+➡️ Run:
+
+```bash
+docker-compose up -d
+```
+
+---
+
+## 📘 Docker Volumes – Documentation Notes (For You)
+
+### 📌 What are Docker Volumes?
+
+Docker volumes are persistent data storage mechanisms used to store data **outside** the container's file system.
+
+---
+
+### 🛠️ Features of Docker Volumes
+
+* Data safe even if container is deleted
+* Shareable across multiple containers
+* Optimized for performance
+* Managed by Docker (unlike bind mounts)
+
+---
+
+### 📁 Common Use Cases
+
+* Database storage (MongoDB, MySQL, PostgreSQL)
+* Log files
+* User uploads
+* Caching or temp file storage between service restarts
+
+---
+
+### 🔐 Best Practices
+
+* Always use named volumes for production data
+* Use volume for `/data/db`, `/var/lib/mysql`, etc. for DBs
+* Avoid storing data inside container filesystem directly
+* Use `docker-compose` for consistent volume setup
+
+---
+
+### 📦 Folder Structure Example:
+
+```
+/mongo-app
+│
+├── docker-compose.yml
+└── data/
+    └── (empty or .gitignore file)
+```
+
+---
+
+### 🧹 Clean-up Tips:
+
+```bash
+# List all volumes
+docker volume ls
+
+# Remove specific volume
+docker volume rm volume-name
+
+# Remove all unused volumes
+docker volume prune
+```
+
+---
+
+## ✅ Summary (Hinglish)
+
+| 🔍 Topic      | 💡 Explanation                                   |
+| ------------- | ------------------------------------------------ |
+| Docker Volume | Container ke bahar ka data storage               |
+| Safe          | Container delete hone par bhi data safe          |
+| Shareable     | Multiple containers ek volume use kar sakte hain |
+| Persistent    | Restart ke baad bhi data rahega                  |
+| Easy Commands | `create`, `ls`, `rm`, `inspect`, `prune`         |
+
+---
+
+## 🔍 **Problem:**
+
+> Jab aap Docker Compose se apna project chala rahe ho (`docker compose up`) aur `server.js` ya kisi JS file me koi **code change** karte ho, to wo **browser me reflect nahi hota** bina container ko dubara run kiye.
+
+---
+
+## 🧠 **Reason:**
+
+Docker container ek isolated environment hota hai. By default, jab aap `my-app` container banate ho using `build: .`, to:
+
+* Docker ek image banata hai aapke code ke base par.
+* Phir wo container us image se run karta hai.
+* **Par wo image me code "freeze" ho jata hai build time pe**, to agar aap baad me `server.js` ya koi bhi file change karte ho **host machine** pe, wo container ke andar reflect nahi hota.
+
+---
+
+## ✅ **Solution: Use volume binding to sync host code with container**
+
+Aapko Docker Compose me `volumes` ka use karna chahiye taaki container hamesha **aapke local code** ko read kare.
+
+### 🔧 **Fix your `docker-compose.yml` like this:**
+
+```yaml
+version: '3.8'
+
+services: 
+  mongodb: 
+    image: mongo
+    container_name: mongodb
+    ports : 
+      - 27018:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: qwerty
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 8081:8081
+    restart: always
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=qwerty
+      - ME_CONFIG_MONGODB_URL=mongodb://admin:qwerty@mongodb:27017/
+    depends_on:
+      - mongodb
+
+  my-app:
+    build: .
+    ports:
+      - 5050:5050
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - mongodb
+```
+
+📌 `volumes`:
+
+* `.:/app` → Local current directory ko container ke `/app` folder se bind karta hai.
+* `/app/node_modules` → Iska use hum karte hain taaki local machine ke `node_modules` accidentally container ke overwrite na ho.
+
+> ⚠️ Make sure aapke Dockerfile me `WORKDIR /app` ho set.
+
+---
+
+## 🔁 **Live Reloading (Optional but recommended)**
+
+### Agar aap chahte ho ki:
+
+* File save karte hi server auto-restart ho jaye (without `docker compose down && up`),
+
+### 🔥 Use `nodemon` in your container
+
+#### Step 1: Install `nodemon` in your project
+
+```bash
+npm install --save-dev nodemon
+```
+
+#### Step 2: Update your `package.json` scripts:
+
+```json
+"scripts": {
+  "start": "node server.js",
+  "dev": "nodemon server.js"
+}
+```
+
+#### Step 3: Update your `Dockerfile`:
+
+```dockerfile
+FROM node:18
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+CMD ["npm", "run", "dev"]
+```
+
+---
+
+## 🔹 1. **What is a Volume in Docker?**
+
+### 🚫 By default:
+
+Docker container ke andar ka file system **isolated** hota hai.
+
+* Agar aap `server.js` container ke andar hai, aur aap host machine pe `server.js` change karte ho, **container ko pata nahi chalega**.
+* Isliye change reflect nahi hota.
+
+### ✅ Solution:
+
+**Volume** = Ek bridge (connection) hota hai:
+
+* **Host machine ka folder/file** ⇄ **Docker container ka folder/file**
+
+So agar aap local pe `server.js` change karte ho, and wo volume se container ke `/app` se connected hai, to **live update** ho jata hai container ke andar bhi.
+
+---
+
+## 🔹 2. **Types of Volumes**
+
+| Type              | Description                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------------- |
+| **Bind Mounts**   | Host machine ka specific folder container ke andar mount karte ho                        |
+| **Named Volumes** | Docker apne internal folder me ek volume banata hai (useful for persistent data like DB) |
+
+---
+
+## 🔹 3. **Use Case: Node.js App with Bind Mount**
+
+Imagine aapka project structure aisa hai:
+
+```
+/my-node-app
+  ├── server.js
+  ├── package.json
+  ├── node_modules/
+  └── Dockerfile
+```
+
+### 🧩 In your `docker-compose.yml`:
+
+```yaml
+my-app:
+  build: .
+  ports:
+    - 5050:5050
+  volumes:
+    - .:/app               # ← This is bind mount
+    - /app/node_modules    # ← Ignore local node_modules
+```
+
+**Explanation:**
+
+| Line                | Meaning                                                                                                                                                              |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.:/app`            | Aapka local folder (.) container ke `/app` folder me mount hoga                                                                                                      |
+| `/app/node_modules` | Ye ek trick hai – taaki aapka local `node_modules` folder container ke andar overwrite na ho jaye (kyunki Linux vs Mac/Windows ka `node_modules` different hota hai) |
+
+---
+
+## 🔹 4. **Diagram Explanation**
+
+```
+Host Machine                         Docker Container
+--------------                       ----------------
+/my-node-app                         /app
+|                                   |
+|- server.js       ─────────────▶   |- server.js (auto updated)
+|- package.json    ─────────────▶   |- package.json
+|- node_modules/                    |- node_modules/  (inside container only)
+```
+
+So jab aap **VSCode me server.js** save karoge, wo directly container ke `/app/server.js` me bhi update ho jata hai – isliye restart hone pe latest code run hota hai.
+
+---
+
+## 🔹 5. **Why This Is Important in Development?**
+
+### ✅ Benefits:
+
+* No need to rebuild the image after every code change
+* Instant feedback during development
+* Great with tools like `nodemon`
+
+---
+
+## 🔄 6. **Production vs Development Volumes**
+
+| Environment | Use Volumes? | Why?                                |
+| ----------- | ------------ | ----------------------------------- |
+| Development | ✅ Yes        | For live code sync                  |
+| Production  | ❌ No         | Code should be frozen (image-based) |
+
+---
+
+## ✅ **Real Example Recap**
+
+If you're using:
+
+* `volumes: - .:/app` → You are saying: **"Hey Docker, run my local code directly inside the container"**
+
+Combine it with `nodemon`, and you’re ready for a full dev workflow!
+
+---
+
+## 📌 Bonus: `docker-compose.override.yml` for dev
+
+You can also create a separate override file just for dev:
+
+```yaml
+# docker-compose.override.yml
+services:
+  my-app:
+    volumes:
+      - .:/app
+      - /app/node_modules
+```
+
+So that your main `docker-compose.yml` is production-safe.
+
+---
+---
+---
+---
+
+## 🧪 Command:
+
+```bash
+docker-compose up cfar-ui
+```
+
+### ✅ Iska matlab:
+
+> **Sirf `cfar-ui` service ko run karo** (jo `docker-compose.yml` me define hai), **along with any services it depends on** (via `depends_on`, if any).
+
+---
+
+## 🔍 Important Points:
+
+### 1. **Ye `cfar-ui` wali service ko run karega**
+
+Agar aapke `docker-compose.yml` me multiple services hain (e.g., `mongodb`, `mongo-express`, `cfar-ui`), to ye command **sirf `cfar-ui`** ko run karega.
+
+### 2. ✅ Agar `cfar-ui` ke andar `depends_on` defined hai:
+
+```yaml
+cfar-ui:
+  depends_on:
+    - backend
+    - mongodb
+```
+
+To wo **un services ko bhi automatically run karega**, taaki `cfar-ui` sahi se kaam kare.
+
+But agar **`depends_on` nahi hai**, to **wo baaki services run nahi hongi** — chahe wo pehle likhi ho ya baad me.
+
+---
+
+## 💡 Example for clarity
+
+```yaml
+version: '3'
+services:
+  mongodb:
+    image: mongo
+
+  mongo-express:
+    image: mongo-express
+
+  cfar-ui:
+    image: dynatech/cfar-ui
+    depends_on:
+      - mongodb
+```
+
+### ➤ Command: `docker-compose up cfar-ui`
+
+🔸 Ye run karega:
+
+* ✅ `cfar-ui`
+* ✅ `mongodb` (because of `depends_on`)
+
+🔸 Ye **skip karega**:
+
+* ❌ `mongo-express` (kyunki wo `depends_on` me nahi hai)
+
+---
+
+## ✅ So, Conclusion:
+
+| Statement                                                                                        | ✅ Correct?    |
+| ------------------------------------------------------------------------------------------------ | ------------- |
+| "Ye sirf pehli service run karta hai jo file me likhi ho"                                        | ❌ Galat       |
+| "Ye sirf us service ko run karta hai jiska naam diya gaya ho (`cfar-ui`) + uske dependencies ko" | ✅ Bilkul Sahi |
+
+---
+---
+---
+---
+
+## Question ?
+
+> **Ek cheez mujhe samajh nahi aa rahi hai, please clear karo:**
+>
+> Mere paas ek `Dockerfile` aur ek `docker-compose.yml` file hai.
+>
+> Mere Dockerfile ke end me already ye line likhi hai:
+>
+> ```Dockerfile
+> CMD [ "npm", "run", "start" ]
+> ```
+>
+> Matlab agar koi external command na di jaye to container `npm start` run karega — ye default behavior hai.
+>
+> **Ab confusion ye hai** ki agar Dockerfile me already `CMD` diya gaya hai, to phir mujhe `docker-compose.yml` ke andar `command:` tag use karke alag se command kyun likhni pad rahi hai?
+>
+> Jaise ki `cfar-ui` service me `command: npm run start:storybook` diya gaya hai, aur `cfar-prod` me `npm run preview` likha hai.
+>
+> To kya `docker-compose.yml` ka `command:` Dockerfile ke `CMD` ko override karta hai?
+> Aur is tarah alag-alag command likhne ka real use-case kya hota hai jab sab same Dockerfile se ban rahe hain?
+
+
+---
+
+Answer :
+
+tumne **Dockerfile ke `CMD` vs `docker-compose.yml` ke `command`** ke beech ka actual confusion pakda hai jo har developer ko clear hona chahiye.
+
+Main tumhe **clear, practical, aur real-world logic ke saath** samjha raha hoon ki `docker-compose.yml` me `command:` likhne ki **need kya hoti hai**, jab `Dockerfile` me pehle se `CMD` diya hua hai.
+
+---
+
+## 🧠 Core Concept: Who wins – Dockerfile CMD vs docker-compose command?
+
+| Location                        | Purpose                                                   | Winner                |
+| ------------------------------- | --------------------------------------------------------- | --------------------- |
+| `Dockerfile → CMD`              | Default command for container if **no override is given** | ❌ Loses if overridden |
+| `docker-compose.yml → command:` | **Overrides** the CMD of Dockerfile                       | ✅ **Wins** if present |
+
+---
+
+## 🎯 So, **Why `command:` is used in docker-compose.yml?**
+
+Because:
+
+> It allows you to **override the default CMD** defined in the Dockerfile **without editing** the Dockerfile itself.
+
+Yeh **super useful** hota hai jab:
+
+* Tum ek hi image se **multiple modes** run karna chahte ho (dev, storybook, preview, prod)
+* Jaise tumhare case me:
+
+---
+
+### ✅ Your Scenario (Real Use Case):
+
+You have 1 Dockerfile, but 3 different services:
+
+| Service     | Purpose           | What it runs              |
+| ----------- | ----------------- | ------------------------- |
+| `cfar-ui`   | Runs Storybook    | `npm run start:storybook` |
+| `cfar-app`  | Runs Main App     | `npm start`               |
+| `cfar-prod` | Runs Preview Mode | `npm run preview`         |
+
+And **Dockerfile CMD** me likha hai:
+
+```Dockerfile
+CMD [ "npm", "run", "start"]
+```
+
+So agar tum `command:` nahi doge, to **sabhi services by default `npm start` run karenge**.
+
+### ⚠️ Problem:
+
+But tum chahte ho ki:
+
+* Storybook ke liye → `npm run start:storybook`
+* Preview ke liye → `npm run preview`
+* App ke liye → `npm start`
+
+---
+
+## ✅ Solution:
+
+Aapne smartly `command:` override use kiya in `docker-compose.yml`:
+
+```yaml
+cfar-ui:
+  command: npm run start:storybook
+
+cfar-app:
+  command: npm start
+
+cfar-prod:
+  command: npm run preview
+```
+
+### 🧠 Isse benefit:
+
+* Tumhara **Dockerfile generic rehta hai**
+* Aur `docker-compose.yml` se tum flexible behavior set kar paate ho **without touching image** again and again
+
+---
+
+## 📦 Extra Note:
+
+### Tum ye bhi kar sakte the:
+
+```bash
+docker run dynatech/cfar-ui npm run preview
+```
+
+But ye CLI level pe thoda messy hota hai — isliye `command:` in `docker-compose.yml` is **cleaner and scalable way**.
+
+---
+
+## 🔚 Final Answer
+
+> **Yes**, `docker-compose.yml` ka `command:` tag is used to **override** the default `CMD` of the Dockerfile.
+
+Aur tumhare case me uska use 100% valid hai kyunki tum ek hi base Dockerfile se **alag-alag services ko alag commands** ke saath run kar rahe ho (storybook, app, preview).
+
+---
+
