@@ -2162,3 +2162,457 @@ Aur tumhare case me uska use 100% valid hai kyunki tum ek hi base Dockerfile se 
 
 ---
 
+## Docker ke beginner to advanced level tak ki sabhi important commands ki list
+
+---
+
+## 🔰 **Beginner Level Docker Commands**
+
+### 1. `docker --version`
+
+**Kaam:** Docker ka installed version dikhata hai.
+**Example:**
+
+```bash
+docker --version
+```
+
+---
+
+### 2. `docker info`
+
+**Kaam:** Docker engine ka detailed system info dikhata hai.
+**Example:**
+
+```bash
+docker info
+```
+
+---
+
+### 3. `docker pull <image-name>`
+
+**Kaam:** Docker Hub se image download karta hai.
+**Example:**
+
+```bash
+docker pull nginx
+```
+
+---
+
+### 4. `docker images`
+
+**Kaam:** Local system me jitni bhi images hain unki list dikhata hai.
+**Example:**
+
+```bash
+docker images
+```
+
+---
+
+### 5. `docker run <image>`
+
+**Kaam:** Image ko run karta hai aur container create karta hai.
+**Common flags:**
+
+* `-d` → background me run kare
+* `-p` → ports bind kare
+* `--name` → container ko custom naam de
+* `-e` → environment variable set kare
+  **Example:**
+
+```bash
+docker run -d --name web-app -p 8080:80 nginx
+```
+
+---
+
+### 6. `docker ps`
+
+**Kaam:** Currently running containers dikhata hai.
+**Example:**
+
+```bash
+docker ps
+```
+
+---
+
+### 7. `docker ps -a`
+
+**Kaam:** All (running + stopped) containers dikhata hai.
+**Example:**
+
+```bash
+docker ps -a
+```
+
+---
+
+### 8. `docker stop <container-id|name>`
+
+**Kaam:** Container ko stop karta hai.
+**Example:**
+
+```bash
+docker stop web-app
+```
+
+---
+
+### 9. `docker start <container-id|name>`
+
+**Kaam:** Stopped container ko start karta hai.
+**Example:**
+
+```bash
+docker start web-app
+```
+
+---
+
+### 10. `docker restart <container-id|name>`
+
+**Kaam:** Container ko restart karta hai.
+**Example:**
+
+```bash
+docker restart web-app
+```
+
+---
+
+### 11. `docker rm <container-id|name>`
+
+**Kaam:** Container ko delete karta hai.
+**Example:**
+
+```bash
+docker rm web-app
+```
+
+---
+
+### 12. `docker rmi <image-id|name>`
+
+**Kaam:** Docker image ko delete karta hai.
+**Example:**
+
+```bash
+docker rmi nginx
+```
+
+---
+
+### 13. `docker exec -it <container-name> bash`
+
+**Kaam:** Running container me bash shell open karta hai.
+**Example:**
+
+```bash
+docker exec -it web-app bash
+```
+
+---
+
+### 14. `docker logs <container-name>`
+
+**Kaam:** Container ke logs dikhata hai.
+**Example:**
+
+```bash
+docker logs web-app
+```
+
+---
+
+### 15. `docker build -t <name>:<tag> .`
+
+**Kaam:** Dockerfile se image banata hai.
+**Example:**
+
+```bash
+docker build -t my-app:latest .
+```
+
+---
+
+## 🔁 **Intermediate Level Docker Commands**
+
+### 16. `docker-compose up`
+
+**Kaam:** `docker-compose.yml` file ke through multiple containers run karta hai.
+**Example:**
+
+```bash
+docker-compose up
+```
+
+### 17. `docker-compose down`
+
+**Kaam:** Saare containers, networks, volumes ko stop aur remove karta hai.
+**Example:**
+
+```bash
+docker-compose down
+```
+
+---
+
+### 18. `docker network ls`
+
+**Kaam:** Docker networks ki list dikhata hai.
+**Example:**
+
+```bash
+docker network ls
+```
+
+---
+
+### 19. `docker volume ls`
+
+**Kaam:** Volumes ki list dikhata hai.
+**Example:**
+
+```bash
+docker volume ls
+```
+
+---
+
+### 20. `docker volume create <volume-name>`
+
+**Kaam:** New volume create karta hai.
+**Example:**
+
+```bash
+docker volume create mongo-data
+```
+
+---
+
+### 21. `docker system prune`
+
+**Kaam:** Unused images, containers, networks sab clean karta hai.
+**Example:**
+
+```bash
+docker system prune
+```
+
+---
+
+### 22. `docker inspect <container-name>`
+
+**Kaam:** Container ya image ka low-level detailed info deta hai (JSON format).
+**Example:**
+
+```bash
+docker inspect web-app
+```
+
+---
+
+### 23. `docker tag <image> <new-name>`
+
+**Kaam:** Image ko rename/tag karta hai.
+**Example:**
+
+```bash
+docker tag my-app my-repo/my-app:v1
+```
+
+---
+
+### 24. `docker login`
+
+**Kaam:** DockerHub me login karne ke liye.
+**Example:**
+
+```bash
+docker login
+```
+
+---
+
+### 25. `docker push <image>`
+
+**Kaam:** Image ko DockerHub me upload karta hai.
+**Example:**
+
+```bash
+docker push my-repo/my-app:v1
+```
+
+---
+
+### 26. `docker save -o <file.tar> <image>`
+
+**Kaam:** Image ko tar file me export karta hai.
+**Example:**
+
+```bash
+docker save -o my-app.tar my-app
+```
+
+---
+
+### 27. `docker load -i <file.tar>`
+
+**Kaam:** Tar file se image import karta hai.
+**Example:**
+
+```bash
+docker load -i my-app.tar
+```
+
+---
+
+### 28. `docker rename <old-name> <new-name>`
+
+**Kaam:** Container ka naam change karta hai.
+**Example:**
+
+```bash
+docker rename web-app my-nginx
+```
+
+---
+
+## 🚀 **Advanced Level Docker Commands**
+
+### 29. `docker stats`
+
+**Kaam:** Live container resource usage stats dikhata hai (CPU, Memory, etc).
+**Example:**
+
+```bash
+docker stats
+```
+
+---
+
+### 30. `docker cp <container>:/path/in/container /host/path`
+
+**Kaam:** Container se host machine me file copy karta hai.
+**Example:**
+
+```bash
+docker cp web-app:/app/logs.txt ./logs.txt
+```
+
+---
+
+### 31. `docker cp /host/path <container>:/path/in/container`
+
+**Kaam:** Host se container me file copy karta hai.
+**Example:**
+
+```bash
+docker cp ./file.txt web-app:/usr/share/nginx/html
+```
+
+---
+
+### 32. `docker update --memory <limit> <container>`
+
+**Kaam:** Container ka resource (memory, CPU) update karta hai.
+**Example:**
+
+```bash
+docker update --memory 500m web-app
+```
+
+---
+
+### 33. `docker events`
+
+**Kaam:** Docker engine ke real-time events dikhata hai.
+**Example:**
+
+```bash
+docker events
+```
+
+---
+
+### 34. `docker top <container>`
+
+**Kaam:** Container ke running processes dikhata hai.
+**Example:**
+
+```bash
+docker top web-app
+```
+
+---
+
+### 35. `docker export <container> > file.tar`
+
+**Kaam:** Container ko tar format me export karta hai (stateful backup).
+**Example:**
+
+```bash
+docker export web-app > app.tar
+```
+
+---
+
+### 36. `docker import < file.tar>`
+
+**Kaam:** Tar file se new image banata hai.
+**Example:**
+
+```bash
+docker import app.tar my-app
+```
+
+---
+
+### 37. `docker history <image>`
+
+**Kaam:** Image banne ka history dikhata hai (layers, size, etc).
+**Example:**
+
+```bash
+docker history nginx
+```
+
+---
+
+### 38. `docker buildx`
+
+**Kaam:** Multi-platform builds aur advanced build options ke liye use hota hai.
+**Example:**
+
+```bash
+docker buildx build --platform linux/amd64,linux/arm64 -t my-app .
+```
+
+---
+
+### 39. `docker context`
+
+**Kaam:** Multiple Docker contexts (remote/local engines) ke beech switch karne ke liye.
+**Example:**
+
+```bash
+docker context ls
+```
+
+---
+
+### 40. `docker login --username <username> --password <password>`
+
+**Kaam:** DockerHub me login karne ka CLI shortcut.
+**Example:**
+
+```bash
+docker login --username myuser --password mypass
+```
+
+---
+
