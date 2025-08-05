@@ -948,24 +948,68 @@ MONGO_INITDB_ROOT_PASSWORD=secret
 
 ### 📄 Dockerfile (multi-stage for Node.js app)
 
-```Dockerfile
-# === Base stage (dependencies only)
+```dockerfile
+# ===============================
+# === BASE STAGE ===============
+# This stage sets up Node environment and installs dependencies.
+# It is reused by both development and production stages to avoid repeating setup.
+# ===============================
+
+# Use Node.js v18 on Alpine Linux (lightweight)
 FROM node:18-alpine as base
+
+# Set the working directory inside the container to /app
 WORKDIR /app
+
+# Copy only package.json and package-lock.json (dependency files)
+# This helps in leveraging Docker cache – if these files don't change, Docker will not reinstall packages
 COPY package*.json ./
+
+# Install all NPM dependencies
 RUN npm install
 
-# === Development stage
+# ===============================
+# === DEVELOPMENT STAGE ========
+# Used when running app in development mode with live reload (like `npm run dev`)
+# ===============================
 FROM base as development
+
+# Copy all project files from host to container
 COPY . .
+
+# Set the command to start development server
 CMD ["npm", "run", "dev"]
 
-# === Production stage
+
+# ===============================
+# === PRODUCTION STAGE =========
+# Used for building and running production-ready optimized app
+# ===============================
 FROM base as production
+
+# Copy all project files again (important: needs full source code to build)
 COPY . .
+
+# Run production build (transpile, optimize, etc.)
 RUN npm run build
+
+# Start the built app using Node.js
 CMD ["node", "src/index.js"]
 ```
+
+---
+
+### ✅ Summary for Beginners:
+
+| Section               | Purpose                                             |
+| --------------------- | --------------------------------------------------- |
+| `FROM node:18-alpine` | Start from a lightweight Node.js image              |
+| `WORKDIR /app`        | Set working directory for all following commands    |
+| `COPY package*.json`  | Only copy dependency files for faster Docker builds |
+| `RUN npm install`     | Install dependencies                                |
+| `COPY . .`            | Copy your full app source code into the container   |
+| `CMD [...]`           | Command to start the app (`dev` or `node`)          |
+
 
 ---
 
